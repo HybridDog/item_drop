@@ -17,7 +17,7 @@ minetest.register_globalstep(function(dtime)
 		local pos = player:getpos()
 		pos.y = pos.y+0.5
 		local inv = player:get_inventory()
-		
+
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
 			if not object:is_player()
 			and object:get_luaentity()
