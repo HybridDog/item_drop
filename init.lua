@@ -14,26 +14,29 @@ minetest.register_globalstep(function(dtime)
 	end
 	timer = 0
 	for _,player in ipairs(minetest.get_connected_players()) do
-		local pos = player:getpos()
-		pos.y = pos.y+0.5
-		local inv = player:get_inventory()
+		local pname = player:get_player_name()
+		if minetest.get_player_privs(pname).interact then
+			local pos = player:getpos()
+			pos.y = pos.y+0.5
+			local inv = player:get_inventory()
 
-		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
-			if not object:is_player()
-			and object:get_luaentity()
-			and object:get_luaentity().name == "__builtin:item" then
-				local str = object:get_luaentity().itemstring
-				local item = ItemStack(str)
-				if inv
-				and inv:room_for_item("main", item) then
-					if str ~= "" then
-						minetest.sound_play("item_drop_pickup", {
-							to_player = player:get_player_name(),
-						})
-						object:get_luaentity().itemstring = ""
-						inv:add_item("main", item)
+			for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
+				if not object:is_player()
+				and object:get_luaentity()
+				and object:get_luaentity().name == "__builtin:item" then
+					local str = object:get_luaentity().itemstring
+					local item = ItemStack(str)
+					if inv
+					and inv:room_for_item("main", item) then
+						if str ~= "" then
+							minetest.sound_play("item_drop_pickup", {
+								to_player = pname,
+							})
+							object:get_luaentity().itemstring = ""
+							inv:add_item("main", item)
+						end
+						object:remove()
 					end
-					object:remove()
 				end
 			end
 		end
