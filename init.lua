@@ -1,47 +1,52 @@
 local timer = -1
 
-local item_entity = minetest.registered_entities["__builtin:item"]
-local old_on_activate = item_entity.on_activate or function()end
-item_entity.on_activate = function(self, staticdata, dtime_s)
-	old_on_activate(self, staticdata, dtime_s)
-	timer = -1
-end
-
 minetest.register_globalstep(function(dtime)
 	timer = timer+dtime
 	if timer < 0.1 then
 		return
 	end
 	timer = 0
-	for _,player in ipairs(minetest.get_connected_players()) do
+	for _,player in pairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		if minetest.get_player_privs(pname).interact then
 			local pos = player:getpos()
 			pos.y = pos.y+0.5
 			local inv = player:get_inventory()
+			if not inv then
+				minetest.log("error", "[item_drop] "..pname.." doesn't have an inventory.")
+				return
+			end
 
-			for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
+			for _,object in pairs(minetest.get_objects_inside_radius(pos, 1)) do
 				if not object:is_player()
-				and object:get_luaentity()
-				and object:get_luaentity().name == "__builtin:item" then
-					local str = object:get_luaentity().itemstring
-					local item = ItemStack(str)
-					if inv
-					and inv:room_for_item("main", item) then
-						if str ~= "" then
+				and vector.equals(object:getvelocity(), {x=0, y=0, z=0}) then
+					local ent = object:get_luaentity()
+					if ent
+					and ent.name == "__builtin:item"
+					and ent.itemstring ~= "" then
+						local item = ItemStack(ent.itemstring)
+						if inv:room_for_item("main", item) then
 							minetest.sound_play("item_drop_pickup", {
 								to_player = pname,
 							})
-							object:get_luaentity().itemstring = ""
+							ent.itemstring = ""
 							inv:add_item("main", item)
+							object:remove()
 						end
-						object:remove()
 					end
 				end
 			end
 		end
 	end
 end)
+
+--[[ previous fix for the immediate picking up
+local item_entity = minetest.registered_entities["__builtin:item"]
+local old_on_activate = item_entity.on_activate or function() end
+item_entity.on_activate = function(...)
+	old_on_activate(...)
+	timer = -1
+end--]]
 
 
 if minetest.setting_get("log_mods") then
