@@ -1,22 +1,11 @@
-local timer = -1
-
-minetest.register_globalstep(function(dtime)
-	timer = timer+dtime
-	if timer < 0.1 then
-		return
-	end
-	timer = 0
+local function do_step()
 	for _,player in pairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
-		if minetest.get_player_privs(pname).interact then
+		if minetest.get_player_privs(pname).interact
+		and not player:get_player_control().sneak then
 			local pos = player:getpos()
 			pos.y = pos.y+0.5
-			local inv = player:get_inventory()
-			if not inv then
-				minetest.log("error", "[item_drop] "..pname.." doesn't have an inventory.")
-				return
-			end
-
+			local inv
 			for _,object in pairs(minetest.get_objects_inside_radius(pos, 1)) do
 				if not object:is_player()
 				and vector.equals(object:getvelocity(), {x=0, y=0, z=0}) then
@@ -24,6 +13,13 @@ minetest.register_globalstep(function(dtime)
 					if ent
 					and ent.name == "__builtin:item"
 					and ent.itemstring ~= "" then
+						if not inv then
+							inv = player:get_inventory()
+							if not inv then
+								minetest.log("error", "[item_drop] "..pname.." doesn't have an inventory.")
+								break
+							end
+						end
 						local item = ItemStack(ent.itemstring)
 						if inv:room_for_item("main", item) then
 							minetest.sound_play("item_drop_pickup", {
@@ -38,15 +34,11 @@ minetest.register_globalstep(function(dtime)
 			end
 		end
 	end
-end)
 
---[[ previous fix for the immediate picking up
-local item_entity = minetest.registered_entities["__builtin:item"]
-local old_on_activate = item_entity.on_activate or function() end
-item_entity.on_activate = function(...)
-	old_on_activate(...)
-	timer = -1
-end--]]
+	minetest.after(0.1, do_step)
+end
+
+minetest.after(3, do_step)
 
 
 if minetest.setting_get("log_mods") then
