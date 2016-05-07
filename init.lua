@@ -2,6 +2,7 @@ local function do_step()
 	for _,player in pairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		if minetest.get_player_privs(pname).interact
+		and player:get_hp() > 0
 		and not player:get_player_control().sneak then
 			local pos = player:getpos()
 			pos.y = pos.y+0.5
