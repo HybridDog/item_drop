@@ -24,7 +24,7 @@ local function do_step()
 						local item = ItemStack(ent.itemstring)
 						if inv:room_for_item("main", item) then
 							minetest.sound_play("item_drop_pickup", {
-								to_player = pname,
+								to_player = pname, gain = 0.4
 							})
 							ent.itemstring = ""
 							inv:add_item("main", item)
