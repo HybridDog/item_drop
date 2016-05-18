@@ -28,6 +28,23 @@ local function pick_item(object, player)
 	return 0.01
 end
 
+--[[ optional support for function delayer
+local do_step
+local delay_function = minetest.delay_function
+if delay_function then
+	local df = delay_function
+	local function delayed_step()
+		df(2, do_step)
+	end
+	function delay_function(time)
+		minetest.after(time, delayed_step)
+	end
+else
+	function delay_function(time)
+		minetest.after(time, do_step)
+	end
+end--]]
+
 local function do_step()
 	local next_step
 	for _,player in pairs(minetest.get_connected_players()) do
