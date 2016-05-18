@@ -1,4 +1,35 @@
+local load_time_start = minetest.get_us_time()
+
+
+local function pick_item(object, player)
+	if object:is_player()
+	or not vector.equals(object:getvelocity(), {x=0, y=0, z=0}) then
+		return
+	end
+	local ent = object:get_luaentity()
+	if not ent
+	or ent.name ~= "__builtin:item"
+	or ent.itemstring == "" then
+		return
+	end
+	local inv = player:get_inventory()
+	if not inv then
+		minetest.log("error", "[item_drop] "..player:get_player_name().." doesn't have an inventory.")
+		return 1
+	end
+	local item = ItemStack(ent.itemstring)
+	if not inv:room_for_item("main", item) then
+		return
+	end
+	minetest.sound_play("item_drop_pickup", {pos = object:getpos(), gain = 0.4})
+	ent.itemstring = ""
+	inv:add_item("main", item)
+	object:remove()
+	return 0.01
+end
+
 local function do_step()
+	local next_step
 	for _,player in pairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		if minetest.get_player_privs(pname).interact
@@ -6,42 +37,25 @@ local function do_step()
 		and not player:get_player_control().sneak then
 			local pos = player:getpos()
 			pos.y = pos.y+0.5
-			local inv
 			for _,object in pairs(minetest.get_objects_inside_radius(pos, 1)) do
-				if not object:is_player()
-				and vector.equals(object:getvelocity(), {x=0, y=0, z=0}) then
-					local ent = object:get_luaentity()
-					if ent
-					and ent.name == "__builtin:item"
-					and ent.itemstring ~= "" then
-						if not inv then
-							inv = player:get_inventory()
-							if not inv then
-								minetest.log("error", "[item_drop] "..pname.." doesn't have an inventory.")
-								break
-							end
-						end
-						local item = ItemStack(ent.itemstring)
-						if inv:room_for_item("main", item) then
-							minetest.sound_play("item_drop_pickup", {
-								to_player = pname, gain = 0.4
-							})
-							ent.itemstring = ""
-							inv:add_item("main", item)
-							object:remove()
-						end
-					end
+				local step = pick_item(object, player)
+				if step then
+					next_step = step
+					break
 				end
 			end
 		end
 	end
-
-	minetest.after(0.1, do_step)
+	minetest.after(next_step or 0.1, do_step)
 end
 
 minetest.after(3, do_step)
 
 
-if minetest.setting_get("log_mods") then
-	minetest.log("action", "item_drop loaded")
+local time = (minetest.get_us_time() - load_time_start) / 1000000
+local msg = "[item_drop] loaded after ca. " .. time .. " seconds."
+if time > 0.01 then
+	print(msg)
+else
+	minetest.log("info", msg)
 end
