@@ -8,8 +8,11 @@ local function pick_item(object, player)
 	end
 	local ent = object:get_luaentity()
 	if not ent
-	or ent.name ~= "__builtin:item"
-	or ent.itemstring == "" then
+	or ent.name ~= "__builtin:item" then
+		return
+	end
+	if ent.itemstring == "" then
+		minetest.log("error", "item_drop found removed item")
 		return
 	end
 	local inv = player:get_inventory()
