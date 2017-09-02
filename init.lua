@@ -34,7 +34,9 @@ local function pickup_step()
 	local players = minetest.get_connected_players()
 	for i = 1,#players do
 		local player = players[i]
-		if player:get_hp() > 0 then
+		if not player:get_player_control().sneak
+		and minetest.get_player_privs(player:get_player_name()).interact
+		and player:get_hp() > 0 then
 			local pos = player:getpos()
 			pos.y = pos.y + 0.5
 			local near_objects = minetest.get_objects_inside_radius(pos, 1)
