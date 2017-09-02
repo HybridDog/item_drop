@@ -1,11 +1,15 @@
 local function pickup_step()
-	for _,player in ipairs(minetest.get_connected_players()) do
-		if player:get_hp() > 0 or not minetest.setting_getbool("enable_damage") then
+	local players = minetest.get_connected_players()
+	for i = 1,#players do
+		local player = players[i]
+		if player:get_hp() > 0 then
 			local pos = player:getpos()
 			pos.y = pos.y+0.5
 			local inv = player:get_inventory()
 
-			for _,object in ipairs(minetest.env:get_objects_inside_radius(pos, 1)) do
+			local near_objects = minetest.get_objects_inside_radius(pos, 1)
+			for i = 1,#near_objects do
+				local object = near_objects[i]
 				if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
 					if inv and inv:room_for_item("main", ItemStack(object:get_luaentity().itemstring)) then
 						inv:add_item("main", ItemStack(object:get_luaentity().itemstring))
