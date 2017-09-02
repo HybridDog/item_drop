@@ -1,32 +1,51 @@
+local function pick_item(object, player)
+	if object:is_player()
+	or not vector.equals(object:getvelocity(), {x=0, y=0, z=0}) then
+		return
+	end
+	local ent = object:get_luaentity()
+	if not ent
+	or ent.name ~= "__builtin:item"
+	or ent.itemstring == "" then
+		return
+	end
+	local inv = player:get_inventory()
+	if not inv then
+		minetest.log("error", "[item_drop] " .. player:get_player_name() ..
+			" doesn't have an inventory.")
+		return 1
+	end
+	local item = ItemStack(ent.itemstring)
+	if not inv:room_for_item("main", item) then
+		return
+	end
+	minetest.sound_play("item_drop_pickup", {pos = object:getpos(), gain = 0.4})
+	ent.itemstring = ""
+	inv:add_item("main", item)
+	object:remove()
+	return 0.01
+end
+
 local function pickup_step()
+	local next_step
 	local players = minetest.get_connected_players()
 	for i = 1,#players do
 		local player = players[i]
 		if player:get_hp() > 0 then
 			local pos = player:getpos()
-			pos.y = pos.y+0.5
-			local inv = player:get_inventory()
-
+			pos.y = pos.y + 0.5
 			local near_objects = minetest.get_objects_inside_radius(pos, 1)
 			for i = 1,#near_objects do
 				local object = near_objects[i]
-				if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
-					if inv and inv:room_for_item("main", ItemStack(object:get_luaentity().itemstring)) then
-						inv:add_item("main", ItemStack(object:get_luaentity().itemstring))
-						if object:get_luaentity().itemstring ~= "" then
-							minetest.sound_play("item_drop_pickup", {
-								to_player = player:get_player_name(),
-								gain = 0.4,
-							})
-						end
-						object:get_luaentity().itemstring = ""
-						object:remove()
-					end
+				local step = pick_item(object, player)
+				if step then
+					next_step = step
+					break
 				end
 			end
 		end
 	end
-	minetest.after(0.1, pickup_step)
+	minetest.after(next_step or 0.1, pickup_step)
 end
 minetest.after(3.0, pickup_step)
 
