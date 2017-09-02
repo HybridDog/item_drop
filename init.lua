@@ -4,7 +4,7 @@ minetest.register_globalstep(function(dtime)
 			local pos = player:getpos()
 			pos.y = pos.y+0.5
 			local inv = player:get_inventory()
-			
+
 			for _,object in ipairs(minetest.env:get_objects_inside_radius(pos, 1)) do
 				if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
 					if inv and inv:room_for_item("main", ItemStack(object:get_luaentity().itemstring)) then
@@ -20,7 +20,7 @@ minetest.register_globalstep(function(dtime)
 					end
 				end
 			end
-			
+
 			for _,object in ipairs(minetest.env:get_objects_inside_radius(pos, 2)) do
 				if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
 					if object:get_luaentity().collect then
@@ -37,7 +37,7 @@ minetest.register_globalstep(function(dtime)
 							object:get_luaentity().object:set_properties({
 								physical = false
 							})
-							
+
 							minetest.after(1, function(args)
 								local lua = object:get_luaentity()
 								if object == nil or lua == nil or lua.itemstring == nil then
@@ -61,7 +61,7 @@ minetest.register_globalstep(function(dtime)
 									})
 								end
 							end, {player, object})
-							
+
 						end
 					end
 				end
@@ -98,7 +98,7 @@ function minetest.handle_node_drops(pos, drops, digger)
 						z = -z
 					end
 					obj:setvelocity({x=1/x, y=obj:getvelocity().y, z=1/z})
-					
+
 					-- FIXME this doesnt work for deactiveted objects
 					if minetest.setting_get("remove_items") and tonumber(minetest.setting_get("remove_items")) then
 						minetest.after(tonumber(minetest.setting_get("remove_items")), function(obj)
