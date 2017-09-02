@@ -1,3 +1,6 @@
+local load_time_start = minetest.get_us_time()
+
+
 local function pick_item(object, player)
 	if object:is_player()
 	or not vector.equals(object:getvelocity(), {x=0, y=0, z=0}) then
@@ -90,6 +93,11 @@ function minetest.handle_node_drops(pos, drops, digger)
 	end
 end
 
-if minetest.setting_get("log_mods") then
-	minetest.log("action", "item_drop loaded")
+
+local time = (minetest.get_us_time() - load_time_start) / 1000000
+local msg = "[item_drop] loaded after ca. " .. time .. " seconds."
+if time > 0.01 then
+	print(msg)
+else
+	minetest.log("info", msg)
 end
