@@ -1,4 +1,4 @@
-minetest.register_globalstep(function(dtime)
+local function pickup_step()
 	for _,player in ipairs(minetest.get_connected_players()) do
 		if player:get_hp() > 0 or not minetest.setting_getbool("enable_damage") then
 			local pos = player:getpos()
@@ -68,7 +68,9 @@ minetest.register_globalstep(function(dtime)
 			end
 		end
 	end
-end)
+	minetest.after(0.1, pickup_step)
+end
+minetest.after(3.0, pickup_step)
 
 function minetest.handle_node_drops(pos, drops, digger)
 	local inv
