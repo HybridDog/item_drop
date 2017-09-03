@@ -88,7 +88,7 @@ if minetest.settings:get_bool("enable_item_drop") then
 						end
 						local z = math.random(-5, 4)
 						if z >= 0 then
-							x = x+1
+							z = z+1
 						end
 						obj:setvelocity({x=1/x, y=obj:getvelocity().y, z=1/z})
 
