@@ -216,10 +216,16 @@ and not minetest.settings:get_bool("creative_mode") then
 				name = item:get_name()
 			end
 
+			if name == "" then
+				-- Sometimes nothing should be dropped
+				count = 0
+			end
+
 			for _ = 1,count do
 				local obj = minetest.add_item(pos, name)
 				if not obj then
-					error("Couldn't spawn item")
+					error("Couldn't spawn item \"" .. name ..
+						"\", drops: " .. dump(drops))
 				end
 
 				local vel = obj:getvelocity()
