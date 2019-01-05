@@ -15,12 +15,12 @@ minetest.settings:get_bool("enable_item_pickup") ~= false then
 	local magnet_time = tonumber(
 		minetest.settings:get("item_drop.magnet_time")) or 5.0
 	local pickup_age = tonumber(
-		minetest.settings:get("item_drop.pickup_age")) or 0.5
+		minetest.settings:get("item_drop.pickup_age")) or -1
 	local key_triggered = minetest.settings:get_bool(
-		"item_drop.enable_pickup_key") or
+		"item_drop.enable_pickup_key") ~= false or
 		minetest.settings:get_bool("enable_item_pickup_key") ~= false
 	local key_invert = minetest.settings:get_bool(
-		"item_drop.pickup_keyinvert") or false
+		"item_drop.pickup_keyinvert") ~= false
 	local keytype
 	if key_triggered then
 		keytype = minetest.settings:get("item_drop.pickup_keytype") or
@@ -279,8 +279,8 @@ minetest.settings:get_bool("enable_item_pickup") ~= false then
 	minetest.after(3.0, pickup_step)
 end
 
-if minetest.settings:get_bool("item_drop.enable_item_drop") ~= false and
-minetest.settings:get_bool("enable_item_drop") ~= false
+if (minetest.settings:get_bool("item_drop.enable_item_drop")
+	or minetest.settings:get_bool("enable_item_drop"))
 and not minetest.settings:get_bool("creative_mode") then
 	function minetest.handle_node_drops(pos, drops)
 		for i = 1,#drops do

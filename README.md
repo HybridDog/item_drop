@@ -16,7 +16,7 @@ developed by [PilzAdam](https://github.com/PilzAdam/item_drop).
 * All settings may be configured from within the game itself.
   (Settings tab > Advanced settings > Mods > item_drop)
 * Drops nodes as in-world items on dig if `item_drop.enable_item_drop` is
-  `true` (true by default) It does nothing in creative mode.
+  `true`. It does nothing in creative mode.
 * Puts dropped items to the player's inventory if `item_drop.enable_item_pickup`
   is `true` (true by default)
   * Multiple items are picked in a quick succession instead of all at once which
@@ -41,7 +41,7 @@ developed by [PilzAdam](https://github.com/PilzAdam/item_drop).
     * Left and Right keys combined (`LeftAndRight`)
     * Right mouse button (`RMB`)
     * Sneak key and right mouse button combined (`SneakAndRMB`)
-  * If `item_drop.pickup_keyinvert` is `true` (false by default), items are
+  * If `item_drop.pickup_keyinvert` is `true`, items are
     collected when the key is not pressed instead of when it's pressed.
 * Displays a particle of the picked item above the player if
   `item_drop.pickup_particle` is `true` (true by default)

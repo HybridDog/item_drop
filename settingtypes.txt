@@ -2,13 +2,13 @@
 item_drop.enable_item_pickup (Enable item pickups) bool true
 
 #Drop items in-world on dig, does nothing in creative mode
-item_drop.enable_item_drop (Enable item drops) bool true
+item_drop.enable_item_drop (Enable item drops) bool false
 
 #Use a key to pick up items
 item_drop.enable_pickup_key (Use pickup key) bool true
 
 #Collect items when the key is not pressed instead of when it is pressed
-item_drop.pickup_keyinvert (Invert pickup key) bool false
+item_drop.pickup_keyinvert (Invert pickup key) bool true
 
 #What keytype to use as pickup key
 item_drop.pickup_keytype (Pickup keytype) enum Use Use,Sneak,LeftAndRight,RMB,SneakAndRMB
@@ -32,4 +32,4 @@ item_drop.magnet_radius (Magnet radius) float -1
 item_drop.magnet_time (Magnet time) float 5.0
 
 #Time delay in seconds after autopicking an item if it's dropped by a player
-item_drop.pickup_age (Pickup age) float 0.5
+item_drop.pickup_age (Pickup age) float -1
